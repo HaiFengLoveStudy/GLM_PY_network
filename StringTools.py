@@ -70,14 +70,22 @@ def str2list(str) -> list:
 
 
 def filewriter(list: list) -> str:
-    file = open('data.json', 'a', encoding='utf-8')
+    file = open('data text.json', 'a', encoding='utf-8')
     i = 1
     for e in list:
         # print(f"正在写入第{i}条数据")
         i = i + 1
         file.write(e)
     file.write(',,')
-
+def queueFlieWriterHandler(queue: deque):
+    file=open("queue.txt", 'w', encoding='utf-8')
+    queue_items = []    #用于持久化队列
+    while not queue.empty():
+        item = queue.get()
+        queue_items.append(item)
+        queue.task_done()  # 标记
+    json_data=json.dumps(queue_items)
+    file.write(json_data)
 
 if __name__ == '__main__':
     str_original = get_course('计算机网络工程')  # 获取数据
@@ -92,6 +100,7 @@ if __name__ == '__main__':
         data_queue.appendleft(data.topic)
     while data_queue:
         print('队列数据',data_queue)
+        queueFlieWriterHandler(data_queue)
         current_data = data_queue.pop()
         print(f'正在查询{current_data}')
         str_original = get_course(current_data)  # 获取数据

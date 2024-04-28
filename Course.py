@@ -1,16 +1,11 @@
-class Course:
-    def __init__(self, topic, definition, difficulty):
-        self.topic = topic
-        self.definition = definition
-        self.difficulty = difficulty
-
-    def print_topic(self):
-        print(f"Topic: {self.topic}")
-        print(f"Definition: {self.definition}")
-        print(f"Difficulty: {self.difficulty}")
-
-    def update_difficulty(self, new_difficulty):
-        self.difficulty = new_difficulty
-
-    def update_definition(self, new_definition):
-        self.definition = new_definition
+from zhipuai import ZhipuAI
+client = ZhipuAI(api_key="fa80d4c885fde528c1f7bbbc7f6e6f79.HLPSBDLa1Zv4fNv7") # 请填写您自己的APIKey
+response = client.chat.completions.create(
+    model="glm-4",  # 填写需要调用的模型名称
+    messages=[
+        {"role": "user", "content": "你好！你叫什么名字"},
+    ],
+    stream=True,
+)
+for chunk in response:
+    print(chunk.choices[0].delta)
