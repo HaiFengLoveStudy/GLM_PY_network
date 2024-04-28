@@ -1,11 +1,20 @@
-from zhipuai import ZhipuAI
-client = ZhipuAI(api_key="fa80d4c885fde528c1f7bbbc7f6e6f79.HLPSBDLa1Zv4fNv7") # 请填写您自己的APIKey
-response = client.chat.completions.create(
-    model="glm-4",  # 填写需要调用的模型名称
-    messages=[
-        {"role": "user", "content": "你好！你叫什么名字"},
-    ],
-    stream=True,
-)
-for chunk in response:
-    print(chunk.choices[0].delta)
+import json
+
+from collections import deque
+
+
+def queueFlieWriterHandler(queue: deque):
+    file = open("queue.txt", 'w', encoding='utf-8')
+    queue_items = []  # 用于持久化队列
+    for item in queue:
+        item = deque.get()
+        queue_items.append(item)
+        queue.task_done()  # 标记
+    json_data = json.dumps(queue_items)
+    file.write(json_data)
+if __name__ == '__main__':
+    deque=deque()
+    for i in range(10):
+        deque.append(i)
+
+    queueFlieWriterHandler(deque)

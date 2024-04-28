@@ -3,6 +3,7 @@ from collections import deque
 from zhipuai import ZhipuAI
 import json
 
+
 # 定义class类
 class Course:
     def __init__(self, topic, definition, difficulty):
@@ -60,45 +61,68 @@ def str2list(str) -> list:
         courses.append(course)
     return courses
 
-    # 写入文件
+
+def save_queue_to_file(deque, filename):
+    list_obj = list(deque)
+    json_str = json.dumps(list_obj, ensure_ascii=False)
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(json_str)
+    print('写入的队列为:', deque)
 
 
-def jsonfilewriter(list: list) -> str:
-    file = open('data.json', 'a', encoding='utf-8')
-    i = 1
-    for e in list:
-        # print(f"正在写入第{i}条数据")
-        i = i + 1
-        file.write(e)
-    file.write(',,')
+# 从文件恢复队列
+def load_queue_from_file(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        json_str = f.read()
+        list_obj = json.loads(json_str)
+        deque_obj = deque(list_obj)
+        print('恢复的队列为:',deque_obj)
+
+    return deque_obj
+
+
+# 写入文件
+# def jsonfilewriter(list: list) -> str:
+#     file = open('data.json', 'a', encoding='utf-8')
+#     i = 1
+#     for e in list:
+#         # print(f"正在写入第{i}条数据")
+#         i = i + 1
+#         file.write(e)
+#     file.write(',,')
+def jsonFileWriter(list: list, filename: str) -> None:  # 将列表转换为 JSON 格式的字符串
+    json_str = json.dumps([vars(course) for course in list], ensure_ascii=False)
+    with open(filename, 'a', encoding='utf-8') as file:
+        file.write(json_str)
+        file.write('\n')  # 添加换行符以分隔不同的 JSON 对象
+
+
 # 这里很死亡，把queue队列转换成list 然后在把list转成json进行存储
 # 初始化的时候需要先json转list在转queue初始化queue
-def queueFlieWriterHandler(queue: deque):
-    file=open("queue.txt", 'w', encoding='utf-8')
-    queue_items = []    #用于持久化队列
-    while not queue.empty():
-        item = queue.get()
-        queue_items.append(item)
-        queue.task_done()  # 标记
-    json_data=json.dumps(queue_items)
-    file.write(json_data)
+def dequeFlieWriterHandler(deque: deque):
+    list_obj = list(deque)
+    json_str = json.dumps(list_obj, ensure_ascii=False)
+    with open('queue.json', 'w', encoding='utf-8') as f:
+        f.write(json_str)
 
 
 if __name__ == '__main__':
     str_original = get_course('计算机网络工程')  # 获取数据
     str_format = strhandler(str_original)  # 格式化脏json
     data_list = str2list(str_format)  # json转list
-    jsonfilewriter(str(str_format))
+    jsonFileWriter(str(str_format), 'data.json')
     # 设置队列用来广度优先便利
     # todo：队列持久化来方便断点续传
     data_queue = deque()
+    data_queue=load_queue_from_file('deque.json')
     for data in data_list:
         # 添加数据
         data_queue.appendleft(data.topic)
 
     while data_queue:
-        print('队列数据',data_queue)
-        queueFlieWriterHandler(data_queue)
+        print('队列数据', data_queue)
+        save_queue_to_file(data_queue,"deque.json")
+        # dequeFlieWriterHandler(data_queue)
         current_data = data_queue.pop()
         print(f'正在查询{current_data}')
         str_original = get_course(current_data)  # 获取数据
@@ -108,7 +132,7 @@ if __name__ == '__main__':
         for data in data_list:
             print(data)
         print('==========================')
-        jsonfilewriter(str(str_format))
+        jsonFileWriter(data_list1, "data.json")
 
         for data in data_list1:
             print('写入数据：', data)
