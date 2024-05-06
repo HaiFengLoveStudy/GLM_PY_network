@@ -51,18 +51,41 @@ def get_course(topic: str) -> string:
         ],
     )
     resp_str = response.choices[0].message.content
+    # print(resp_str)
     return resp_str
 
 
 # 把获取到的字符串转成纯json字符串
 # 输入：脏json字符串
 # 输出：纯json字符串
+# def strformat(str) -> str:
+#     begin = str.find('{')
+#     end = str.find('}')
+#     # print(begin, end)
+#     str_formatted = str[begin:end + 1]  # 截取纯json
+#     return str_formatted
+#
+
+
+
 def strformat(str) -> str:
-    begin = str.find('[')
-    end = str.find(']')
-    # print(begin, end)
-    str_formatted = str[begin:end + 1]  # 截取纯json
+    str_formatted=''
+    if str.find('[')>0:
+        # 处理只有多组数据
+        begin = str.find('[')
+        end = str.find(']')
+        # print(begin, end)
+        str_formatted = str[begin:end + 1]  # 截取纯json
+    else:
+        # 处理一组数据
+        begin = str.find('{')
+        end = str.find('}')
+        # print(begin, end)
+        str_formatted = f"[{str[begin:end + 1]}]"  # 截取纯json
+
+
     return str_formatted
+
 
 
 # 纯json格式转换list
