@@ -40,7 +40,7 @@ logging.basicConfig(
 # 输出：脏json
 #
 def get_course(topic: str) -> string:
-    api_key=""  # 填写自己的apikey
+    api_key="fa80d4c885fde528c1f7bbbc7f6e6f79.HLPSBDLa1Zv4fNv7"  # 填写自己的apikey
     msg = f"请列举出{topic}所需要学习的详细具体的知识点(topic),此知识点必须是和大学科计算机网络工程相关的如果不相关，则略过，此知识点的定义(definition),并返回此知识点的学习难度（1-5）(difficulty),""使用中文输出，输出json格式内容。注意只返回json，格式参考:\"topic\": \"计算机硬件基础", "difficulty\": 5,\"definition\": \"了解计算机硬件的组成，包括CPU、内存、硬盘等，及其工作原理。"
     client = ZhipuAI(api_key=api_key)  # 填写您自己的APIKey
     response = client.chat.completions.create(
@@ -126,7 +126,7 @@ def save_list_to_json(file_path: str, course_list: list):  # 将列表转换为J
 
 
 if __name__ == '__main__':
-
+    # 日志信息
     logger = logging.getLogger()
     console_log = logging.StreamHandler()
     console_log.setLevel(logging.INFO)
@@ -136,6 +136,7 @@ if __name__ == '__main__':
 
     count = 1
     str_original = get_course('计算机网络工程')  # 获取数据
+    logger.info('正在启动查询...')
     str_format = strformat(str_original)  # 格式化脏json
     data_list = str2list(str_format, '计算机网络工程')  # json转list
     save_list_to_json('data.json', data_list)  # 数据写入文件
@@ -160,7 +161,6 @@ if __name__ == '__main__':
         #     print(data.topic)
         save_list_to_json("data.json", data_list1)
         for data in data_list1:
-            logger.info(f'写入数据：{data.topic}')
+            logger.info(f'写入第{count}数据：{data.topic}')
             data_queue.appendleft(data.topic)  # 加入队列
-        logger.info(f'写入第{count}个数据')
-        count += 1
+            count += 1
